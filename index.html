@@ -229,38 +229,36 @@
         .forecast-card {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 12px;
-            padding: 15px 8px;
+            padding: 10px 8px;
             text-align: center;
             position: absolute;
             left: 0;
             right: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 0;
+            overflow: hidden;
         }
 
         .forecast-day {
-            font-size: 1rem;
+            font-size: 0.9rem;
             color: #a0a0a0;
-            margin-bottom: 5px;
         }
 
         .forecast-icon {
-            font-size: 2rem;
-            margin-bottom: 5px;
+            font-size: 1.8rem;
+            flex-shrink: 1;
         }
 
         .forecast-temp {
-            font-size: 1.8rem;
+            font-size: 1.4rem;
             font-weight: 700;
         }
 
         .forecast-low {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: #707070;
-        }
-
-        .forecast-cond {
-            font-size: 0.85rem;
-            color: #a0a0a0;
-            margin-top: 5px;
         }
 
         /* Time To View */
@@ -726,21 +724,29 @@
                 const lowestLow = Math.min(...data.daily.temperature_2m_min);
                 const tempRange = highestHigh - lowestLow;
 
-                // Estimate card height as percentage of container (roughly 25% for the card content)
-                const cardHeightPercent = 25;
-                const availableRange = 100 - cardHeightPercent;
-
                 data.daily.time.forEach((date, i) => {
                     const d = new Date(date + 'T12:00:00');
                     const weather = getWeather(data.daily.weather_code[i]);
                     const highTemp = data.daily.temperature_2m_max[i];
                     const lowTemp = data.daily.temperature_2m_min[i];
 
-                    // Calculate top position based on high temp
-                    // Highest high = 0% (top), lowest high = availableRange%
-                    const topPercent = tempRange > 0
-                        ? ((highestHigh - highTemp) / tempRange) * availableRange
-                        : 0;
+                    // Calculate position and height based on temperature
+                    // Top of card corresponds to high temp, bottom to low temp
+                    // highestHigh = 0% from top, lowestLow = 100% from top
+                    let topPercent = 0;
+                    let heightPercent = 100;
+
+                    if (tempRange > 0) {
+                        topPercent = ((highestHigh - highTemp) / tempRange) * 100;
+                        const bottomPercent = ((highestHigh - lowTemp) / tempRange) * 100;
+                        heightPercent = bottomPercent - topPercent;
+                    }
+
+                    // Ensure minimum height for readability
+                    const minHeight = 15;
+                    if (heightPercent < minHeight) {
+                        heightPercent = minHeight;
+                    }
 
                     // Create column container
                     const column = document.createElement('div');
@@ -750,6 +756,7 @@
                     const card = document.createElement('div');
                     card.className = 'forecast-card';
                     card.style.top = `${topPercent}%`;
+                    card.style.height = `${heightPercent}%`;
                     card.innerHTML = `
                         <div class="forecast-day">${d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</div>
                         <div class="forecast-icon">${weather.icon}</div>
