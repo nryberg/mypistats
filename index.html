@@ -85,17 +85,18 @@
             letter-spacing: 2px;
         }
 
-        .time-remaining {
-            font-size: 1.8rem;
-            color: #707070;
-            font-weight: 300;
-        }
-
         .date {
             font-size: 2rem;
             font-weight: 300;
             color: #a0a0a0;
             margin-bottom: 30px;
+        }
+
+        .weather-row {
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            gap: 15px;
         }
 
         .weather-card {
@@ -105,6 +106,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             gap: 8px;
         }
 
@@ -130,22 +132,26 @@
         /* Hourly Forecast */
         .hourly-forecast {
             display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 180px;
         }
 
         .hourly-item {
             background: rgba(255, 255, 255, 0.08);
             border-radius: 12px;
-            padding: 12px 15px;
-            text-align: center;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            flex: 1;
         }
 
         .hourly-time {
-            font-size: 1rem;
+            font-size: 1.1rem;
             color: #a0a0a0;
-            margin-bottom: 5px;
+            min-width: 55px;
         }
 
         .hourly-icon {
@@ -153,9 +159,8 @@
         }
 
         .hourly-temp {
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             font-weight: 600;
-            margin-top: 5px;
         }
 
         /* Server View */
@@ -297,6 +302,16 @@
         }
 
         /* Saver View */
+        .view#saver {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 0;
+            z-index: -1;
+        }
+
         .saver-container {
             width: 100%;
             height: 100%;
@@ -306,8 +321,31 @@
         #saver-canvas {
             width: 100%;
             height: 100%;
-            border-radius: 20px;
+            border-radius: 0;
             background: #0a0a15;
+        }
+
+        /* Notes View */
+        .view#notes {
+            position: absolute;
+            top: 70px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 0 15px 15px 15px;
+        }
+
+        .notes-container {
+            width: 100%;
+            height: 100%;
+        }
+
+        #notes-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 15px;
+            background: #fff;
         }
 
         /* Screensaver dimmer */
@@ -345,6 +383,9 @@
                 padding: 8px 20px;
                 font-size: 1.1rem;
             }
+            .view#notes {
+                top: 55px;
+            }
             .time {
                 font-size: 3.5rem;
             }
@@ -360,6 +401,23 @@
             }
             .weather-card {
                 padding: 15px;
+            }
+            .hourly-forecast {
+                min-width: 150px;
+            }
+            .hourly-item {
+                padding: 8px 15px;
+                gap: 12px;
+            }
+            .hourly-time {
+                font-size: 1rem;
+                min-width: 50px;
+            }
+            .hourly-icon {
+                font-size: 1.3rem;
+            }
+            .hourly-temp {
+                font-size: 1.3rem;
             }
             .stat-value {
                 font-size: 2rem;
@@ -385,7 +443,7 @@
         <button class="nav-btn" data-view="forecast">Forecast</button>
         <button class="nav-btn" data-view="timeto">Time To</button>
         <button class="nav-btn" data-view="saver">Saver</button>
-        <button class="nav-btn" onclick="window.location.href='http://localhost:8888'">Notes</button>
+        <button class="nav-btn" data-view="notes">Notes</button>
     </nav>
 
     <!-- Now View -->
@@ -393,17 +451,18 @@
         <div class="container">
             <div class="time-row">
                 <div class="time" id="time">--:--</div>
-                <div class="time-remaining" id="time-remaining">-- min</div>
             </div>
             <div class="date" id="date">Loading...</div>
-            <div class="weather-card">
-                <div class="weather-icon" id="weather-icon"></div>
-                <div class="temperature" id="temperature">--°F</div>
-                <div class="condition" id="condition">Loading...</div>
-                <div class="location">Minneapolis, MN 55402</div>
-            </div>
-            <div class="hourly-forecast" id="hourly-forecast">
-                <!-- Hourly forecast will be inserted here -->
+            <div class="weather-row">
+                <div class="weather-card">
+                    <div class="weather-icon" id="weather-icon"></div>
+                    <div class="temperature" id="temperature">--°F</div>
+                    <div class="condition" id="condition">Loading...</div>
+                    <div class="location">Minneapolis, MN 55402</div>
+                </div>
+                <div class="hourly-forecast" id="hourly-forecast">
+                    <!-- Hourly forecast will be inserted here -->
+                </div>
             </div>
         </div>
     </div>
@@ -469,6 +528,20 @@
         </div>
     </div>
 
+    <!-- Saver View -->
+    <div class="view" id="saver">
+        <div class="saver-container">
+            <canvas id="saver-canvas"></canvas>
+        </div>
+    </div>
+
+    <!-- Notes View -->
+    <div class="view" id="notes">
+        <div class="notes-container">
+            <iframe id="notes-iframe" src="https://framboise.tail37abc.ts.net/"></iframe>
+        </div>
+    </div>
+
     <script>
         // Weather condition codes and icons from Open-Meteo
         const weatherData = {
@@ -528,7 +601,6 @@
             // Calculate time to next half hour
             const minutes = now.getMinutes();
             const remaining = minutes < 30 ? 30 - minutes : 60 - minutes;
-            document.getElementById('time-remaining').textContent = `${remaining} min`;
 
             // Update Time To pie chart
             updatePieChart(remaining);
@@ -705,6 +777,141 @@
 
         // Start idle timer
         resetIdleTimer();
+
+        // Screensaver animation
+        const saverCanvas = document.getElementById('saver-canvas');
+        const ctx = saverCanvas.getContext('2d');
+        let saverAnimationId = null;
+        let orbs = [];
+
+        const orbColors = [
+            { r: 74, g: 158, b: 255 },   // Blue
+            { r: 255, g: 107, b: 157 },  // Pink
+            { r: 138, g: 43, b: 226 },   // Purple
+            { r: 0, g: 255, b: 200 },    // Cyan
+            { r: 255, g: 200, b: 87 },   // Gold
+        ];
+
+        function initOrbs() {
+            orbs = [];
+            const numOrbs = 12;
+            for (let i = 0; i < numOrbs; i++) {
+                const color = orbColors[i % orbColors.length];
+                orbs.push({
+                    x: Math.random() * saverCanvas.width,
+                    y: Math.random() * saverCanvas.height,
+                    radius: 20 + Math.random() * 40,
+                    vx: (Math.random() - 0.5) * 2,
+                    vy: (Math.random() - 0.5) * 2,
+                    color: color,
+                    phase: Math.random() * Math.PI * 2
+                });
+            }
+        }
+
+        function resizeSaverCanvas() {
+            const container = saverCanvas.parentElement;
+            saverCanvas.width = container.clientWidth;
+            saverCanvas.height = container.clientHeight;
+            if (orbs.length === 0) {
+                initOrbs();
+            }
+        }
+
+        function drawOrb(orb, time) {
+            const pulse = Math.sin(time * 0.002 + orb.phase) * 0.3 + 0.7;
+            const glowRadius = orb.radius * 2.5;
+
+            // Outer glow
+            const gradient = ctx.createRadialGradient(
+                orb.x, orb.y, 0,
+                orb.x, orb.y, glowRadius
+            );
+            gradient.addColorStop(0, `rgba(${orb.color.r}, ${orb.color.g}, ${orb.color.b}, ${0.8 * pulse})`);
+            gradient.addColorStop(0.4, `rgba(${orb.color.r}, ${orb.color.g}, ${orb.color.b}, ${0.3 * pulse})`);
+            gradient.addColorStop(1, `rgba(${orb.color.r}, ${orb.color.g}, ${orb.color.b}, 0)`);
+
+            ctx.beginPath();
+            ctx.arc(orb.x, orb.y, glowRadius, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            // Inner core
+            const coreGradient = ctx.createRadialGradient(
+                orb.x - orb.radius * 0.3, orb.y - orb.radius * 0.3, 0,
+                orb.x, orb.y, orb.radius
+            );
+            coreGradient.addColorStop(0, `rgba(255, 255, 255, ${0.9 * pulse})`);
+            coreGradient.addColorStop(0.5, `rgba(${orb.color.r}, ${orb.color.g}, ${orb.color.b}, ${0.8 * pulse})`);
+            coreGradient.addColorStop(1, `rgba(${orb.color.r}, ${orb.color.g}, ${orb.color.b}, ${0.4 * pulse})`);
+
+            ctx.beginPath();
+            ctx.arc(orb.x, orb.y, orb.radius, 0, Math.PI * 2);
+            ctx.fillStyle = coreGradient;
+            ctx.fill();
+        }
+
+        function updateOrbs() {
+            orbs.forEach(orb => {
+                orb.x += orb.vx;
+                orb.y += orb.vy;
+
+                // Bounce off walls
+                if (orb.x - orb.radius < 0 || orb.x + orb.radius > saverCanvas.width) {
+                    orb.vx *= -1;
+                    orb.x = Math.max(orb.radius, Math.min(saverCanvas.width - orb.radius, orb.x));
+                }
+                if (orb.y - orb.radius < 0 || orb.y + orb.radius > saverCanvas.height) {
+                    orb.vy *= -1;
+                    orb.y = Math.max(orb.radius, Math.min(saverCanvas.height - orb.radius, orb.y));
+                }
+            });
+        }
+
+        function animateSaver(time) {
+            ctx.fillStyle = '#0a0a15';
+            ctx.fillRect(0, 0, saverCanvas.width, saverCanvas.height);
+
+            updateOrbs();
+
+            // Sort by size for depth effect
+            orbs.sort((a, b) => a.radius - b.radius);
+            orbs.forEach(orb => drawOrb(orb, time));
+
+            saverAnimationId = requestAnimationFrame(animateSaver);
+        }
+
+        function startSaverAnimation() {
+            if (!saverAnimationId) {
+                resizeSaverCanvas();
+                saverAnimationId = requestAnimationFrame(animateSaver);
+            }
+        }
+
+        function stopSaverAnimation() {
+            if (saverAnimationId) {
+                cancelAnimationFrame(saverAnimationId);
+                saverAnimationId = null;
+            }
+        }
+
+        // Start/stop animation based on view visibility
+        const saverView = document.getElementById('saver');
+        const observer = new MutationObserver(() => {
+            if (saverView.classList.contains('active')) {
+                startSaverAnimation();
+            } else {
+                stopSaverAnimation();
+            }
+        });
+        observer.observe(saverView, { attributes: true, attributeFilter: ['class'] });
+
+        // Handle resize
+        window.addEventListener('resize', () => {
+            if (saverView.classList.contains('active')) {
+                resizeSaverCanvas();
+            }
+        });
     </script>
 </body>
 </html>
