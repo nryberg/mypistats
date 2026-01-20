@@ -203,22 +203,21 @@
         /* Forecast View */
         .view#forecast {
             align-items: stretch;
+            padding: 0 15px 15px 15px;
         }
 
         .view#forecast .container {
             height: 100%;
+            width: 100%;
             max-width: 100%;
-            display: flex;
-            flex-direction: column;
         }
 
         .forecast-grid {
             display: flex;
             gap: 10px;
             width: 100%;
-            flex: 1;
+            height: 100%;
             position: relative;
-            padding: 10px;
         }
 
         .forecast-column {
@@ -242,22 +241,21 @@
         }
 
         .forecast-day {
-            font-size: 0.9rem;
+            font-size: 2rem;
+            font-weight: 600;
             color: #a0a0a0;
         }
 
         .forecast-icon {
-            font-size: 1.8rem;
+            font-size: 2.5rem;
             flex-shrink: 1;
         }
 
-        .forecast-temp {
-            font-size: 1.4rem;
-            font-weight: 700;
+        .forecast-temps {
+            font-size: 1.8rem;
         }
 
-        .forecast-low {
-            font-size: 1.1rem;
+        .forecast-temps i {
             color: #707070;
         }
 
@@ -441,7 +439,7 @@
             .stat-value {
                 font-size: 2rem;
             }
-            .forecast-temp {
+            .forecast-temps {
                 font-size: 1.4rem;
             }
         }
@@ -709,20 +707,53 @@
             }
         }
 
+        let forecastData = null;
+
         async function fetchForecast() {
             try {
                 const lat = 44.98, lon = -93.27;
                 const response = await fetch(
                     `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,weather_code&temperature_unit=fahrenheit&timezone=America/Chicago&forecast_days=6`
                 );
-                const data = await response.json();
-                const grid = document.getElementById('forecast-grid');
+                forecastData = await response.json();
+                renderForecast();
+            } catch (error) {
+                document.getElementById('forecast-grid').innerHTML = '<p>Forecast unavailable</p>';
+            }
+        }
+
+        function renderForecast() {
+            if (!forecastData) return;
+
+            const forecastView = document.getElementById('forecast');
+            const grid = document.getElementById('forecast-grid');
+
+            // Only render if the forecast tab is active
+            if (!forecastView.classList.contains('active')) {
+                return;
+            }
+
+            // Use requestAnimationFrame to ensure layout is complete
+            requestAnimationFrame(() => {
+                // Get the actual rendered height using getBoundingClientRect
+                const gridRect = grid.getBoundingClientRect();
+                let containerHeight = gridRect.height;
+
+                // If still no height, use window height minus nav area
+                if (containerHeight <= 0) {
+                    containerHeight = window.innerHeight - 100;
+                }
+
                 grid.innerHTML = '';
+
+                const data = forecastData;
 
                 // Calculate the highest high and lowest low across all days
                 const highestHigh = Math.max(...data.daily.temperature_2m_max);
                 const lowestLow = Math.min(...data.daily.temperature_2m_min);
                 const tempRange = highestHigh - lowestLow;
+
+                console.log('Forecast render:', { containerHeight, highestHigh, lowestLow, tempRange });
 
                 data.daily.time.forEach((date, i) => {
                     const d = new Date(date + 'T12:00:00');
@@ -730,23 +761,25 @@
                     const highTemp = data.daily.temperature_2m_max[i];
                     const lowTemp = data.daily.temperature_2m_min[i];
 
-                    // Calculate position and height based on temperature
+                    // Calculate position and height in pixels
                     // Top of card corresponds to high temp, bottom to low temp
-                    // highestHigh = 0% from top, lowestLow = 100% from top
-                    let topPercent = 0;
-                    let heightPercent = 100;
+                    // highestHigh = 0px from top, lowestLow = containerHeight from top
+                    let topPx = 0;
+                    let heightPx = containerHeight;
 
                     if (tempRange > 0) {
-                        topPercent = ((highestHigh - highTemp) / tempRange) * 100;
-                        const bottomPercent = ((highestHigh - lowTemp) / tempRange) * 100;
-                        heightPercent = bottomPercent - topPercent;
+                        topPx = ((highestHigh - highTemp) / tempRange) * containerHeight;
+                        const bottomPx = ((highestHigh - lowTemp) / tempRange) * containerHeight;
+                        heightPx = bottomPx - topPx;
                     }
 
-                    // Ensure minimum height for readability
-                    const minHeight = 15;
-                    if (heightPercent < minHeight) {
-                        heightPercent = minHeight;
+                    // Ensure minimum height for readability (60px)
+                    const minHeight = 60;
+                    if (heightPx < minHeight) {
+                        heightPx = minHeight;
                     }
+
+                    console.log(`Day ${i}:`, { highTemp, lowTemp, topPx, heightPx });
 
                     // Create column container
                     const column = document.createElement('div');
@@ -755,22 +788,32 @@
                     // Create card
                     const card = document.createElement('div');
                     card.className = 'forecast-card';
-                    card.style.top = `${topPercent}%`;
-                    card.style.height = `${heightPercent}%`;
+                    card.style.top = `${topPx}px`;
+                    card.style.height = `${heightPx}px`;
                     card.innerHTML = `
-                        <div class="forecast-day">${d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</div>
+                        <div class="forecast-day">${d.toLocaleDateString('en-US', { weekday: 'short' })}</div>
                         <div class="forecast-icon">${weather.icon}</div>
-                        <div class="forecast-temp">${Math.round(highTemp)}°</div>
-                        <div class="forecast-low">${Math.round(lowTemp)}°</div>
+                        <div class="forecast-temps"><b>${Math.round(highTemp)}°</b> | <i>${Math.round(lowTemp)}°</i></div>
                     `;
 
                     column.appendChild(card);
                     grid.appendChild(column);
                 });
-            } catch (error) {
-                document.getElementById('forecast-grid').innerHTML = '<p>Forecast unavailable</p>';
-            }
+            });
         }
+
+        // Re-render forecast when the tab becomes visible
+        document.querySelector('.nav-btn[data-view="forecast"]').addEventListener('click', () => {
+            // Wait for the tab switch to complete, then render
+            setTimeout(renderForecast, 100);
+        });
+
+        // Re-render forecast on window resize
+        window.addEventListener('resize', () => {
+            if (document.getElementById('forecast').classList.contains('active')) {
+                renderForecast();
+            }
+        });
 
         async function fetchServerStats() {
             try {
