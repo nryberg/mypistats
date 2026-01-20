@@ -19,9 +19,49 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            padding: 15px;
+        }
+
+        /* Navigation */
+        .nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: #a0a0a0;
+            padding: 12px 30px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .nav-btn.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #4a9eff;
+            color: #ffffff;
+        }
+
+        /* Views */
+        .view {
+            display: none;
+            flex: 1;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+        }
+
+        .view.active {
+            display: flex;
         }
 
         .container {
@@ -30,28 +70,46 @@
             max-width: 800px;
         }
 
+        /* Now View */
+        .time-row {
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 10px;
+        }
+
         .time {
             font-size: 5rem;
             font-weight: 700;
             letter-spacing: 2px;
-            margin-bottom: 10px;
+        }
+
+        .time-remaining {
+            font-size: 1.8rem;
+            color: #707070;
+            font-weight: 300;
         }
 
         .date {
             font-size: 2rem;
             font-weight: 300;
             color: #a0a0a0;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
 
-        .weather {
+        .weather-card {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 20px;
-            padding: 30px;
+            padding: 25px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+        }
+
+        .weather-icon {
+            font-size: 4rem;
         }
 
         .temperature {
@@ -67,22 +125,232 @@
         .location {
             font-size: 1.2rem;
             color: #707070;
-            margin-top: 10px;
         }
 
-        .error {
-            color: #ff6b6b;
+        /* Hourly Forecast */
+        .hourly-forecast {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .hourly-item {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 12px 15px;
+            text-align: center;
+        }
+
+        .hourly-time {
+            font-size: 1rem;
+            color: #a0a0a0;
+            margin-bottom: 5px;
+        }
+
+        .hourly-icon {
             font-size: 1.5rem;
         }
 
-        /* Adjustments for 7" screen (typically 800x480) */
+        .hourly-temp {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        /* Server View */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            width: 100%;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 1.2rem;
+            color: #a0a0a0;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .stat-unit {
+            font-size: 1.2rem;
+            color: #707070;
+        }
+
+        .stat-detail {
+            font-size: 1rem;
+            color: #707070;
+            margin-top: 5px;
+        }
+
+        /* Forecast View */
+        .forecast-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            width: 100%;
+        }
+
+        .forecast-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px 8px;
+            text-align: center;
+        }
+
+        .forecast-day {
+            font-size: 1rem;
+            color: #a0a0a0;
+            margin-bottom: 5px;
+        }
+
+        .forecast-icon {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .forecast-temp {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .forecast-low {
+            font-size: 1.2rem;
+            color: #707070;
+        }
+
+        .forecast-cond {
+            font-size: 0.85rem;
+            color: #a0a0a0;
+            margin-top: 5px;
+        }
+
+        /* Time To View */
+        .time-to-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .pie-chart-wrapper {
+            position: relative;
+            width: 280px;
+            height: 280px;
+        }
+
+        .pie-chart {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .pie-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.1);
+            stroke-width: 40;
+        }
+
+        .pie-fill {
+            fill: none;
+            stroke: #4a9eff;
+            stroke-width: 40;
+            stroke-linecap: round;
+            transition: stroke-dasharray 0.5s ease;
+        }
+
+        .pie-center-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .pie-minutes {
+            font-size: 5rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .pie-label {
+            font-size: 1.5rem;
+            color: #a0a0a0;
+            margin-top: 5px;
+        }
+
+        .time-to-info {
+            font-size: 1.4rem;
+            color: #707070;
+        }
+
+        /* Saver View */
+        .saver-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        #saver-canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 20px;
+            background: #0a0a15;
+        }
+
+        /* Screensaver dimmer */
+        .dimmer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 2s ease, visibility 2s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .dimmer.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .dimmer-time {
+            font-size: 6rem;
+            font-weight: 200;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Responsive for 7" screen */
         @media (max-height: 500px) {
+            .nav-btn {
+                padding: 8px 20px;
+                font-size: 1.1rem;
+            }
             .time {
-                font-size: 4rem;
+                font-size: 3.5rem;
             }
             .date {
-                font-size: 1.5rem;
-                margin-bottom: 20px;
+                font-size: 1.4rem;
+                margin-bottom: 15px;
             }
             .temperature {
                 font-size: 3.5rem;
@@ -90,109 +358,353 @@
             .condition {
                 font-size: 1.4rem;
             }
-            .weather {
-                padding: 20px;
+            .weather-card {
+                padding: 15px;
+            }
+            .stat-value {
+                font-size: 2rem;
+            }
+            .forecast-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+            .forecast-temp {
+                font-size: 1.4rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="time" id="time">--:--</div>
-        <div class="date" id="date">Loading...</div>
+    <!-- Screensaver dimmer -->
+    <div class="dimmer" id="dimmer">
+        <div class="dimmer-time" id="dimmer-time"></div>
+    </div>
 
-        <div class="weather">
-            <div class="temperature" id="temperature">--°F</div>
-            <div class="condition" id="condition">Loading weather...</div>
-            <div class="location">Minneapolis, MN 55402</div>
+    <nav class="nav">
+        <button class="nav-btn active" data-view="now">Now</button>
+        <button class="nav-btn" data-view="server">Server</button>
+        <button class="nav-btn" data-view="forecast">Forecast</button>
+        <button class="nav-btn" data-view="timeto">Time To</button>
+        <button class="nav-btn" data-view="saver">Saver</button>
+        <button class="nav-btn" onclick="window.location.href='http://localhost:8888'">Notes</button>
+    </nav>
+
+    <!-- Now View -->
+    <div class="view active" id="now">
+        <div class="container">
+            <div class="time-row">
+                <div class="time" id="time">--:--</div>
+                <div class="time-remaining" id="time-remaining">-- min</div>
+            </div>
+            <div class="date" id="date">Loading...</div>
+            <div class="weather-card">
+                <div class="weather-icon" id="weather-icon"></div>
+                <div class="temperature" id="temperature">--°F</div>
+                <div class="condition" id="condition">Loading...</div>
+                <div class="location">Minneapolis, MN 55402</div>
+            </div>
+            <div class="hourly-forecast" id="hourly-forecast">
+                <!-- Hourly forecast will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Server View -->
+    <div class="view" id="server">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">CPU Usage</div>
+                    <div class="stat-value" id="cpu">--<span class="stat-unit">%</span></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Memory</div>
+                    <div class="stat-value" id="memory">--<span class="stat-unit">%</span></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Disk</div>
+                    <div class="stat-value" id="disk">--<span class="stat-unit">%</span></div>
+                    <div class="stat-detail" id="disk-detail">-- / -- GB</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">CPU Temp</div>
+                    <div class="stat-value" id="cputemp">--<span class="stat-unit">°C</span></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Uptime</div>
+                    <div class="stat-value" id="uptime">--</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Load Avg</div>
+                    <div class="stat-value" id="load">--</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forecast View -->
+    <div class="view" id="forecast">
+        <div class="container">
+            <div class="forecast-grid" id="forecast-grid">
+                <!-- Forecast cards will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Time To View -->
+    <div class="view" id="timeto">
+        <div class="container">
+            <div class="time-to-container">
+                <div class="pie-chart-wrapper">
+                    <svg class="pie-chart" viewBox="0 0 200 200">
+                        <circle class="pie-bg" cx="100" cy="100" r="80"></circle>
+                        <circle class="pie-fill" id="pie-fill" cx="100" cy="100" r="80"></circle>
+                    </svg>
+                    <div class="pie-center-text">
+                        <div class="pie-minutes" id="pie-minutes">--</div>
+                        <div class="pie-label">minutes</div>
+                    </div>
+                </div>
+                <div class="time-to-info" id="time-to-info">until the next half hour</div>
+            </div>
         </div>
     </div>
 
     <script>
-        // Weather condition codes from Open-Meteo
-        const weatherCodes = {
-            0: 'Clear sky',
-            1: 'Mainly clear',
-            2: 'Partly cloudy',
-            3: 'Overcast',
-            45: 'Foggy',
-            48: 'Depositing rime fog',
-            51: 'Light drizzle',
-            53: 'Moderate drizzle',
-            55: 'Dense drizzle',
-            56: 'Light freezing drizzle',
-            57: 'Dense freezing drizzle',
-            61: 'Slight rain',
-            63: 'Moderate rain',
-            65: 'Heavy rain',
-            66: 'Light freezing rain',
-            67: 'Heavy freezing rain',
-            71: 'Slight snow',
-            73: 'Moderate snow',
-            75: 'Heavy snow',
-            77: 'Snow grains',
-            80: 'Slight rain showers',
-            81: 'Moderate rain showers',
-            82: 'Violent rain showers',
-            85: 'Slight snow showers',
-            86: 'Heavy snow showers',
-            95: 'Thunderstorm',
-            96: 'Thunderstorm with slight hail',
-            99: 'Thunderstorm with heavy hail'
+        // Weather condition codes and icons from Open-Meteo
+        const weatherData = {
+            0:  { text: 'Clear', icon: '☀️' },
+            1:  { text: 'Mainly clear', icon: '🌤️' },
+            2:  { text: 'Partly cloudy', icon: '⛅' },
+            3:  { text: 'Overcast', icon: '☁️' },
+            45: { text: 'Foggy', icon: '🌫️' },
+            48: { text: 'Rime fog', icon: '🌫️' },
+            51: { text: 'Light drizzle', icon: '🌧️' },
+            53: { text: 'Drizzle', icon: '🌧️' },
+            55: { text: 'Dense drizzle', icon: '🌧️' },
+            56: { text: 'Freezing drizzle', icon: '🌨️' },
+            57: { text: 'Freezing drizzle', icon: '🌨️' },
+            61: { text: 'Light rain', icon: '🌧️' },
+            63: { text: 'Rain', icon: '🌧️' },
+            65: { text: 'Heavy rain', icon: '🌧️' },
+            66: { text: 'Freezing rain', icon: '🌨️' },
+            67: { text: 'Freezing rain', icon: '🌨️' },
+            71: { text: 'Light snow', icon: '🌨️' },
+            73: { text: 'Snow', icon: '❄️' },
+            75: { text: 'Heavy snow', icon: '❄️' },
+            77: { text: 'Snow grains', icon: '🌨️' },
+            80: { text: 'Rain showers', icon: '🌦️' },
+            81: { text: 'Rain showers', icon: '🌦️' },
+            82: { text: 'Heavy showers', icon: '🌧️' },
+            85: { text: 'Snow showers', icon: '🌨️' },
+            86: { text: 'Heavy snow', icon: '❄️' },
+            95: { text: 'Thunderstorm', icon: '⛈️' },
+            96: { text: 'Thunderstorm', icon: '⛈️' },
+            99: { text: 'Thunderstorm', icon: '⛈️' }
         };
+
+        function getWeather(code) {
+            return weatherData[code] || { text: 'Unknown', icon: '❓' };
+        }
+
+        // Navigation
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.view).classList.add('active');
+            });
+        });
 
         function updateDateTime() {
             const now = new Date();
-
-            // Time
-            const timeStr = now.toLocaleTimeString('en-US', {
-                hour: 'numeric',
-                minute: '2-digit',
-                hour12: true
+            document.getElementById('time').textContent = now.toLocaleTimeString('en-US', {
+                hour: 'numeric', minute: '2-digit', hour12: true
             });
-            document.getElementById('time').textContent = timeStr;
-
-            // Date
-            const dateStr = now.toLocaleDateString('en-US', {
-                weekday: 'long',
-                month: 'long',
-                day: 'numeric',
-                year: 'numeric'
+            document.getElementById('date').textContent = now.toLocaleDateString('en-US', {
+                weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'
             });
-            document.getElementById('date').textContent = dateStr;
+
+            // Calculate time to next half hour
+            const minutes = now.getMinutes();
+            const remaining = minutes < 30 ? 30 - minutes : 60 - minutes;
+            document.getElementById('time-remaining').textContent = `${remaining} min`;
+
+            // Update Time To pie chart
+            updatePieChart(remaining);
         }
 
-        async function fetchWeather() {
+        function updatePieChart(remaining) {
+            const pieFill = document.getElementById('pie-fill');
+            const pieMinutes = document.getElementById('pie-minutes');
+            const timeToInfo = document.getElementById('time-to-info');
+
+            // Update the number display
+            pieMinutes.textContent = remaining;
+
+            // Calculate the pie chart fill
+            // circumference = 2 * PI * r = 2 * 3.14159 * 80 ≈ 502.65
+            const circumference = 2 * Math.PI * 80;
+            // remaining is out of 30 minutes max
+            const percentage = remaining / 30;
+            const dashLength = circumference * percentage;
+
+            pieFill.style.strokeDasharray = `${dashLength} ${circumference}`;
+
+            // Update info text
+            const now = new Date();
+            const nextHalfHour = new Date(now);
+            if (now.getMinutes() < 30) {
+                nextHalfHour.setMinutes(30, 0, 0);
+            } else {
+                nextHalfHour.setMinutes(0, 0, 0);
+                nextHalfHour.setHours(nextHalfHour.getHours() + 1);
+            }
+            const targetTime = nextHalfHour.toLocaleTimeString('en-US', {
+                hour: 'numeric', minute: '2-digit', hour12: true
+            });
+            timeToInfo.textContent = `until ${targetTime}`;
+        }
+
+        async function fetchCurrentWeather() {
             try {
-                // Coordinates for Minneapolis, MN (zip 55402)
-                const lat = 44.98;
-                const lon = -93.27;
-
+                const lat = 44.98, lon = -93.27;
                 const response = await fetch(
-                    `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&temperature_unit=fahrenheit&timezone=America/Chicago`
+                    `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&hourly=temperature_2m,weather_code&temperature_unit=fahrenheit&timezone=America/Chicago&forecast_days=1`
                 );
-
-                if (!response.ok) throw new Error('Weather fetch failed');
-
                 const data = await response.json();
-                const temp = Math.round(data.current.temperature_2m);
-                const code = data.current.weather_code;
-                const condition = weatherCodes[code] || 'Unknown';
+                const weather = getWeather(data.current.weather_code);
+                document.getElementById('weather-icon').textContent = weather.icon;
+                document.getElementById('temperature').textContent = `${Math.round(data.current.temperature_2m)}°F`;
+                document.getElementById('condition').textContent = weather.text;
 
-                document.getElementById('temperature').textContent = `${temp}°F`;
-                document.getElementById('condition').textContent = condition;
+                // Display next 4 hours
+                const now = new Date();
+                const currentHour = now.getHours();
+                const hourlyContainer = document.getElementById('hourly-forecast');
+                hourlyContainer.innerHTML = '';
+
+                for (let i = 1; i <= 4; i++) {
+                    const hourIndex = currentHour + i;
+                    if (hourIndex < data.hourly.time.length) {
+                        const temp = Math.round(data.hourly.temperature_2m[hourIndex]);
+                        const hourWeather = getWeather(data.hourly.weather_code[hourIndex]);
+                        const hourTime = new Date(data.hourly.time[hourIndex]);
+                        const timeStr = hourTime.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true });
+
+                        const item = document.createElement('div');
+                        item.className = 'hourly-item';
+                        item.innerHTML = `
+                            <div class="hourly-time">${timeStr}</div>
+                            <div class="hourly-icon">${hourWeather.icon}</div>
+                            <div class="hourly-temp">${temp}°</div>
+                        `;
+                        hourlyContainer.appendChild(item);
+                    }
+                }
             } catch (error) {
-                console.error('Weather error:', error);
                 document.getElementById('condition').textContent = 'Weather unavailable';
+            }
+        }
+
+        async function fetchForecast() {
+            try {
+                const lat = 44.98, lon = -93.27;
+                const response = await fetch(
+                    `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=temperature_2m_max,temperature_2m_min,weather_code&temperature_unit=fahrenheit&timezone=America/Chicago&forecast_days=10`
+                );
+                const data = await response.json();
+                const grid = document.getElementById('forecast-grid');
+                grid.innerHTML = '';
+
+                data.daily.time.forEach((date, i) => {
+                    const d = new Date(date + 'T12:00:00');
+                    const weather = getWeather(data.daily.weather_code[i]);
+                    const card = document.createElement('div');
+                    card.className = 'forecast-card';
+                    card.innerHTML = `
+                        <div class="forecast-day">${d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</div>
+                        <div class="forecast-icon">${weather.icon}</div>
+                        <div class="forecast-temp">${Math.round(data.daily.temperature_2m_max[i])}°</div>
+                        <div class="forecast-low">${Math.round(data.daily.temperature_2m_min[i])}°</div>
+                    `;
+                    grid.appendChild(card);
+                });
+            } catch (error) {
+                document.getElementById('forecast-grid').innerHTML = '<p>Forecast unavailable</p>';
+            }
+        }
+
+        async function fetchServerStats() {
+            try {
+                const response = await fetch('/api/stats');
+                const stats = await response.json();
+                document.getElementById('cpu').innerHTML = `${stats.cpu}<span class="stat-unit">%</span>`;
+                document.getElementById('memory').innerHTML = `${stats.memory}<span class="stat-unit">%</span>`;
+                document.getElementById('disk').innerHTML = `${stats.disk}<span class="stat-unit">%</span>`;
+                document.getElementById('disk-detail').textContent = `${stats.disk_used} / ${stats.disk_total} GB`;
+                document.getElementById('cputemp').innerHTML = `${stats.cpu_temp}<span class="stat-unit">°C</span>`;
+                document.getElementById('uptime').textContent = stats.uptime;
+                document.getElementById('load').textContent = stats.load;
+            } catch (error) {
+                console.error('Server stats unavailable:', error);
             }
         }
 
         // Initial load
         updateDateTime();
-        fetchWeather();
+        fetchCurrentWeather();
+        fetchForecast();
+        fetchServerStats();
 
-        // Update time every second for smooth display
+        // Update time every second
         setInterval(updateDateTime, 1000);
+
+        // Update server stats every 10 seconds
+        setInterval(fetchServerStats, 10000);
+
+        // Screensaver functionality
+        const IDLE_TIMEOUT = 10 * 60 * 1000; // 10 minutes
+        const dimmer = document.getElementById('dimmer');
+        const dimmerTime = document.getElementById('dimmer-time');
+        let idleTimer;
+
+        function updateDimmerTime() {
+            const now = new Date();
+            dimmerTime.textContent = now.toLocaleTimeString('en-US', {
+                hour: 'numeric', minute: '2-digit', hour12: true
+            });
+        }
+
+        function showDimmer() {
+            dimmer.classList.add('active');
+            updateDimmerTime();
+        }
+
+        function hideDimmer() {
+            dimmer.classList.remove('active');
+        }
+
+        function resetIdleTimer() {
+            hideDimmer();
+            clearTimeout(idleTimer);
+            idleTimer = setTimeout(showDimmer, IDLE_TIMEOUT);
+        }
+
+        // Track user activity
+        ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll'].forEach(event => {
+            document.addEventListener(event, resetIdleTimer);
+        });
+
+        // Update dimmer time while active
+        setInterval(() => {
+            if (dimmer.classList.contains('active')) {
+                updateDimmerTime();
+            }
+        }, 1000);
+
+        // Start idle timer
+        resetIdleTimer();
     </script>
 </body>
 </html>
