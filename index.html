@@ -201,11 +201,29 @@
         }
 
         /* Forecast View */
+        .view#forecast {
+            align-items: stretch;
+        }
+
+        .view#forecast .container {
+            height: 100%;
+            max-width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
         .forecast-grid {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
+            display: flex;
             gap: 10px;
             width: 100%;
+            flex: 1;
+            position: relative;
+            padding: 10px;
+        }
+
+        .forecast-column {
+            flex: 1;
+            position: relative;
         }
 
         .forecast-card {
@@ -213,6 +231,9 @@
             border-radius: 12px;
             padding: 15px 8px;
             text-align: center;
+            position: absolute;
+            left: 0;
+            right: 0;
         }
 
         .forecast-day {
@@ -421,9 +442,6 @@
             }
             .stat-value {
                 font-size: 2rem;
-            }
-            .forecast-grid {
-                grid-template-columns: repeat(6, 1fr);
             }
             .forecast-temp {
                 font-size: 1.4rem;
@@ -703,18 +721,44 @@
                 const grid = document.getElementById('forecast-grid');
                 grid.innerHTML = '';
 
+                // Calculate the highest high and lowest low across all days
+                const highestHigh = Math.max(...data.daily.temperature_2m_max);
+                const lowestLow = Math.min(...data.daily.temperature_2m_min);
+                const tempRange = highestHigh - lowestLow;
+
+                // Estimate card height as percentage of container (roughly 25% for the card content)
+                const cardHeightPercent = 25;
+                const availableRange = 100 - cardHeightPercent;
+
                 data.daily.time.forEach((date, i) => {
                     const d = new Date(date + 'T12:00:00');
                     const weather = getWeather(data.daily.weather_code[i]);
+                    const highTemp = data.daily.temperature_2m_max[i];
+                    const lowTemp = data.daily.temperature_2m_min[i];
+
+                    // Calculate top position based on high temp
+                    // Highest high = 0% (top), lowest high = availableRange%
+                    const topPercent = tempRange > 0
+                        ? ((highestHigh - highTemp) / tempRange) * availableRange
+                        : 0;
+
+                    // Create column container
+                    const column = document.createElement('div');
+                    column.className = 'forecast-column';
+
+                    // Create card
                     const card = document.createElement('div');
                     card.className = 'forecast-card';
+                    card.style.top = `${topPercent}%`;
                     card.innerHTML = `
                         <div class="forecast-day">${d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</div>
                         <div class="forecast-icon">${weather.icon}</div>
-                        <div class="forecast-temp">${Math.round(data.daily.temperature_2m_max[i])}°</div>
-                        <div class="forecast-low">${Math.round(data.daily.temperature_2m_min[i])}°</div>
+                        <div class="forecast-temp">${Math.round(highTemp)}°</div>
+                        <div class="forecast-low">${Math.round(lowTemp)}°</div>
                     `;
-                    grid.appendChild(card);
+
+                    column.appendChild(card);
+                    grid.appendChild(column);
                 });
             } catch (error) {
                 document.getElementById('forecast-grid').innerHTML = '<p>Forecast unavailable</p>';
