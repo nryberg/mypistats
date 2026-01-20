@@ -29,7 +29,7 @@ System statistics for the Raspberry Pi:
 
 ### Forecast
 6-day weather forecast (today + 5 days) with a unique visual representation:
-- Each card displays: day of month, weather icon, and temperatures (e.g., **25°** | *18°*)
+- Each card displays: day name (Mon, Tue, etc.), weather icon, and temperatures (e.g., **25°** | *18°*)
 - Each card's **vertical position** is determined by its high temperature (highest high at top of screen)
 - Each card's **height** represents the temperature range between its high and low
 - The top edge of each card aligns with its high temp, the bottom edge with its low temp
