@@ -114,6 +114,18 @@ const IDLE_TIMEOUT = 10 * 60 * 1000; // 10 minutes
 - Chromium browser (for kiosk mode)
 - Network connection (for weather data)
 
+## Screenshots
+
+![Dashboard Screenshot Now](images/now.jpeg)
+
+![Dashboard Screenshot Screensaver](images/screen_saver.jpeg)
+
+![Dashboard Screenshot Server](images/server.jpeg)
+
+![Dashboard Screenshot Time to](images/time_to.jpeg)
+
+![Dashboard Screenshot Forecast](images/forecast.jpeg)
+
 ## License
 
 MIT
