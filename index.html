@@ -388,6 +388,14 @@
             visibility: visible;
         }
 
+        .dimmer.off-hours {
+            background: #000;
+        }
+
+        .dimmer.off-hours .dimmer-time {
+            display: none;
+        }
+
         .dimmer-time {
             font-size: 6rem;
             font-weight: 200;
@@ -843,11 +851,18 @@
         // Update server stats every 10 seconds
         setInterval(fetchServerStats, 10000);
 
+        // Business hours configuration (screen goes fully dark outside these times)
+        const BUSINESS_HOURS_START = 8;          // 8 AM
+        const BUSINESS_HOURS_END = 18;           // 6 PM (exclusive)
+        const BUSINESS_DAYS = [1, 2, 3, 4, 5];  // Mon–Fri (0=Sun, 6=Sat)
+
         // Screensaver functionality
         const IDLE_TIMEOUT = 10 * 60 * 1000; // 10 minutes
         const dimmer = document.getElementById('dimmer');
         const dimmerTime = document.getElementById('dimmer-time');
         let idleTimer;
+        let isOffHours = false;
+        let offHoursWakeTimer = null;
 
         function updateDimmerTime() {
             const now = new Date();
@@ -866,9 +881,48 @@
         }
 
         function resetIdleTimer() {
+            if (isOffHours) {
+                // Temporarily wake screen for 60 seconds on user interaction
+                dimmer.classList.remove('active', 'off-hours');
+                clearTimeout(offHoursWakeTimer);
+                offHoursWakeTimer = setTimeout(() => {
+                    offHoursWakeTimer = null;
+                    checkOffHours();
+                }, 60 * 1000);
+                return;
+            }
             hideDimmer();
             clearTimeout(idleTimer);
             idleTimer = setTimeout(showDimmer, IDLE_TIMEOUT);
+        }
+
+        function isWithinBusinessHours() {
+            const now = new Date();
+            const hour = now.getHours();
+            const day = now.getDay();
+            return BUSINESS_DAYS.includes(day) && hour >= BUSINESS_HOURS_START && hour < BUSINESS_HOURS_END;
+        }
+
+        function checkOffHours() {
+            const duringBusiness = isWithinBusinessHours();
+
+            if (!duringBusiness) {
+                if (!isOffHours) {
+                    isOffHours = true;
+                    clearTimeout(idleTimer);
+                }
+                if (!offHoursWakeTimer) {
+                    dimmer.classList.add('off-hours', 'active');
+                }
+            } else if (isOffHours) {
+                // Business hours have resumed
+                isOffHours = false;
+                clearTimeout(offHoursWakeTimer);
+                offHoursWakeTimer = null;
+                dimmer.classList.remove('off-hours');
+                hideDimmer();
+                resetIdleTimer();
+            }
         }
 
         // Track user activity
@@ -883,8 +937,14 @@
             }
         }, 1000);
 
-        // Start idle timer
-        resetIdleTimer();
+        // Check off-hours every minute and immediately on load
+        setInterval(checkOffHours, 60 * 1000);
+        checkOffHours();
+
+        // Start idle timer (only applies during business hours)
+        if (!isOffHours) {
+            resetIdleTimer();
+        }
 
         // Screensaver animation
         const saverCanvas = document.getElementById('saver-canvas');
